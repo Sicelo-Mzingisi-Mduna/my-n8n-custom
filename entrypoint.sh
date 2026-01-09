@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+echo "ENV: N8N_PYTHON_VENV_PATH='${N8N_PYTHON_VENV_PATH:-<not-set>}'"
+
 VENV_PATH="/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv"
 
 echo "=== STARTUP DIAGNOSTICS ==="
