@@ -1,15 +1,18 @@
-# Use the latest version of n8n (v2.x is recommended as of 2026)
+# Use the latest Debian-based n8n image
 FROM n8nio/n8n:latest
 
-# Switch to root to install system-level software
+# Switch to root to install system software
 USER root
 
-# Install Python 3 and the pip package manager
-RUN apk add --update --no-cache python3 py3-pip
+# Update the package list and install Python 3 and Pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# (Optional) If you need specific libraries like 'requests' or 'pandas', 
-# uncomment the line below:
-# RUN pip install --no-cache-dir --break-system-packages requests pandas
+# If you need to install python libraries (like requests or pandas),
+# Debian now requires the '--break-system-packages' flag inside Docker:
+# RUN pip3 install requests pandas --break-system-packages
 
-# Switch back to the 'node' user for safety
+# Switch back to the 'node' user for security
 USER node
