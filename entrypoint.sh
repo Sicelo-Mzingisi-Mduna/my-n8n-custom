@@ -5,11 +5,8 @@ VENV_PATH="/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Cod
 
 echo "=== STARTUP DIAGNOSTICS ==="
 id
-echo "Listing parent dir:"
 ls -la "$(dirname "$VENV_PATH")" || true
-echo "Listing venv:"
 ls -la "$VENV_PATH" || true
-echo "Listing venv bin:"
 ls -la "$VENV_PATH/bin" || true
 
 if [ -x "$VENV_PATH/bin/python3" ]; then
