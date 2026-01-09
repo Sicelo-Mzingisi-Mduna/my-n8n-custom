@@ -3,7 +3,7 @@ FROM node:20-bookworm-slim
 
 USER root
 
-# 1. Install Python and venv
+# Install Python and venv tools
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -11,19 +11,19 @@ RUN apt-get update && apt-get install -y \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Install n8n
+# Install n8n globally
 RUN npm install -g n8n@latest
 
-# 3. Create the venv in a fixed, simple location
-RUN python3 -m venv /opt/n8n_venv
+# Create the venv in the exact path n8n expects
+RUN python3 -m venv /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
-# 4. Create a shortcut so n8n finds it in the default location too
-RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/ && \
-    ln -s /opt/n8n_venv /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
+# Upgrade pip and install any packages you need for Code nodes
+RUN /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv/bin/python3 -m pip install --upgrade pip
+# Example: install requests if your Python code uses it
+RUN /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv/bin/python3 -m pip install requests
 
-# 5. Set permissions for everything
-RUN chown -R node:node /opt/n8n_venv && \
-    chown -R node:node /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/
+# Fix ownership so n8n (node user) can execute the venv
+RUN chown -R node:node /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
 WORKDIR /home/node
 USER node
