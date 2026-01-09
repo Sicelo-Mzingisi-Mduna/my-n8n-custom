@@ -31,5 +31,4 @@ USER node
 ENV NODE_ENV=production
 EXPOSE 5678
 
-ENTRYPOINT ["tini", "--"]
-CMD ["n8n", "start"]
+COPY --chown=node:node entrypoint.sh /home/node/entrypoint.sh RUN chmod +x /home/node/entrypoint.sh WORKDIR /home/node USER node ENV NODE_ENV=production EXPOSE 5678 ENTRYPOINT ["/home/node/entrypoint.sh"]
