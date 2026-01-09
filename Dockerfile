@@ -1,27 +1,31 @@
-# Use a standard Debian-based Node image (allows apt-get)
+# Use a full Node image so we have access to apt-get
 FROM node:20-bookworm-slim
 
-# Switch to root to install system packages
 USER root
 
-# Install Python, Pip, and Tini (required for n8n to handle processes correctly)
+# 1. Install Python, Pip, and the critical VENV package
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-venv \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
-# Install n8n globally via npm
+# 2. Install n8n globally
 RUN npm install -g n8n@latest
 
-# Set up the environment
-ENV NODE_ENV=production
-WORKDIR /home/node
-EXPOSE 5678
+# 3. PRE-CREATE the virtual environment where n8n expects it
+# This prevents the "Virtual environment is missing" error
+RUN python3 -m venv /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
-# Run as the 'node' user for security
+# 4. Set permissions so the 'node' user can use it
+RUN chown -R node:node /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
+
+WORKDIR /home/node
 USER node
 
-# Use tini to manage the n8n process
+ENV NODE_ENV=production
+EXPOSE 5678
+
 ENTRYPOINT ["tini", "--"]
 CMD ["n8n", "start"]
