@@ -17,8 +17,13 @@ RUN npm install -g n8n@latest
 # 3. Create the venv in a fixed, simple location
 RUN python3 -m venv /opt/n8n_venv
 
-# 4. Set permissions
-RUN chown -R node:node /opt/n8n_venv
+# 4. Create a shortcut so n8n finds it in the default location too
+RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/ && \
+    ln -s /opt/n8n_venv /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
+
+# 5. Set permissions for everything
+RUN chown -R node:node /opt/n8n_venv && \
+    chown -R node:node /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/
 
 WORKDIR /home/node
 USER node
