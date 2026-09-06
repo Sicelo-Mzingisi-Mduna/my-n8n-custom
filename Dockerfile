@@ -18,7 +18,6 @@ ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-
 
 # Force the legacy Python runner (no task runner)
 ENV N8N_RUNNERS_ENABLED=false
-ENV N8N_RUNNERS_MODE=external
 
 # Create the virtual environment and install required Python packages
 RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
