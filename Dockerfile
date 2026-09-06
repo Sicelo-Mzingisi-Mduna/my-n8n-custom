@@ -17,10 +17,8 @@ RUN useradd -m -u 1000 node
 ENV N8N_PYTHON_VENV_PATH=/usr/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
 # Create the virtual environment and install required Python packages
-# *** Added n8n-nodes-base ***
 RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
     && $N8N_PYTHON_VENV_PATH/bin/pip install --no-cache-dir \
-        n8n-nodes-base \
         requests \
         pandas \
         numpy \
