@@ -1,15 +1,24 @@
-# Use the Alpine-based n8n image version you originally had
-FROM n8nio/n8n:2.2.5
+# Use Python Alpine as base (includes apk, Python, pip)
+FROM python:3.11-alpine
 
-# Switch to root to install packages
-USER root
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
 
-# Try absolute path to apk
-RUN /sbin/apk update && /sbin/apk add --no-cache python3 py3-pip && rm -rf /var/cache/apk/*
+# Install n8n globally (use a specific version if you want, e.g., n8n@2.2.5)
+RUN npm install -g n8n@2.2.5
 
-# Ensure the directory n8n uses for Python virtual environments exists and is writable
-RUN mkdir -p /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv \
-    && chown -R node:node /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
+# Set the same environment variable paths as before
+ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
-# Switch back to the non-root 'node' user
+# Create and set permissions for the virtual environment directory
+RUN mkdir -p $N8N_PYTHON_VENV_PATH && chown -R node:node $N8N_PYTHON_VENV_PATH
+
+# Switch to the 'node' user (created by n8n installation, but if it doesn't exist, create it)
+RUN adduser -D -u 1000 node
 USER node
+
+# Expose n8n port
+EXPOSE 5678
+
+# Start n8n
+CMD ["n8n", "start"]
