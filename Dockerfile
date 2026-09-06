@@ -1,41 +1,26 @@
-# Use Debian-based Python image for better package compatibility
-FROM python:3.11-slim
+# Use the official n8n Alpine image (includes Python venv and task runner setup)
+FROM n8nio/n8n:2.2.5-alpine
 
-# Install system dependencies: Node.js, npm, and any required build tools
-RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+# Switch to root to install additional packages
+USER root
 
-# Install n8n globally (keep the same version you had)
-RUN npm install -g n8n@2.2.5
+# Install any extra system packages if needed (not strictly required)
+RUN apk add --no-cache python3 py3-pip
 
-# Set the virtual environment path (same as your Render env var)
-ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
+# The Python venv already exists at the path below.
+# Install the additional Python libraries you'll use.
+RUN /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv/bin/pip install --no-cache-dir \
+    requests \
+    pandas \
+    numpy \
+    sqlalchemy \
+    psycopg2-binary \
+    pymongo \
+    python-dotenv \
+    openpyxl
 
-# Create the 'node' user
-RUN useradd -m -u 1000 node
+# Ensure the venv remains owned by the 'node' user
+RUN chown -R node:node /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
-# Create the Python virtual environment and install common libraries
-RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
-    && $N8N_PYTHON_VENV_PATH/bin/pip install --no-cache-dir \
-        requests \
-        pandas \
-        numpy \
-        sqlalchemy \
-        psycopg2-binary \
-        pymongo \
-        python-dotenv \
-        openpyxl \
-    && chown -R node:node $N8N_PYTHON_VENV_PATH
-
-# Switch to the non-root 'node' user
+# Switch back to the non-root user
 USER node
-
-# Expose n8n port
-EXPOSE 5678
-
-# Start n8n
-CMD ["n8n", "start"]
