@@ -10,11 +10,13 @@ RUN npm install -g n8n@2.2.5
 # Set the same environment variable paths as before
 ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
-# Create and set permissions for the virtual environment directory
+# Create the 'node' user (if it doesn't already exist)
+RUN adduser -D -u 1000 node
+
+# Create the virtual environment directory and set ownership to the node user
 RUN mkdir -p $N8N_PYTHON_VENV_PATH && chown -R node:node $N8N_PYTHON_VENV_PATH
 
-# Switch to the 'node' user (created by n8n installation, but if it doesn't exist, create it)
-RUN adduser -D -u 1000 node
+# Switch to the non-root 'node' user
 USER node
 
 # Expose n8n port
