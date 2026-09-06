@@ -1,20 +1,8 @@
-# Use the official n8n image (Debian-based)
 FROM n8nio/n8n:2.2.5
 
 USER root
 
-# Install Python, pip, and venv (Debian)
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create the virtual environment at the path n8n's internal runner expects
-RUN mkdir -p /opt/runners/task-runner-python \
-    && python3 -m venv /opt/runners/task-runner-python/.venv
-
-# Install required Python packages into that venv
+# Install required Python packages into the pre‑existing runner venv
 RUN /opt/runners/task-runner-python/.venv/bin/pip install --no-cache-dir \
     requests \
     pandas \
@@ -28,5 +16,4 @@ RUN /opt/runners/task-runner-python/.venv/bin/pip install --no-cache-dir \
 # Ensure correct ownership
 RUN chown -R node:node /opt/runners/task-runner-python
 
-# Switch back to the non-root user
 USER node
