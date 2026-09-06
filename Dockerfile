@@ -10,13 +10,11 @@ RUN apt-get update && apt-get install -y curl gnupg \
 # Install n8n globally
 RUN npm install -g n8n@2.2.5
 
-# Create the 'node' user (if not already)
+# Create the 'node' user
 RUN useradd -m -u 1000 node
 
-# Set environment variables inside the image
-ENV N8N_PYTHON_VENV_PATH=/home/node/.n8n-python-venv
-ENV N8N_RUNNERS_ENABLED=false
-ENV N8N_NATIVE_PYTHON_RUNNER=true
+# Set the path n8n's internal task runner expects
+ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
 # Create the virtual environment and install required Python packages
 RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
@@ -30,8 +28,8 @@ RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
         python-dotenv \
         openpyxl
 
-# Ensure the entire home directory is owned by node
-RUN chown -R node:node /home/node
+# Ensure the entire n8n installation directory is owned by node
+RUN chown -R node:node /usr/local/lib/node_modules/n8n
 
 # Switch to the non-root user
 USER node
