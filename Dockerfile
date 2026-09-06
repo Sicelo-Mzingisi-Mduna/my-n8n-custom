@@ -13,11 +13,8 @@ RUN npm install -g n8n@2.2.5
 # Create the 'node' user
 RUN useradd -m -u 1000 node
 
-# Set the path n8n's internal task runner expects
-ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
-
-# Force the legacy Python runner (no task runner)
-ENV N8N_RUNNERS_ENABLED=false
+# Set the correct path (where n8n is actually installed)
+ENV N8N_PYTHON_VENV_PATH=/usr/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
 # Create the virtual environment and install required Python packages
 RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
@@ -32,7 +29,7 @@ RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
         openpyxl
 
 # Ensure the entire n8n installation directory is owned by node
-RUN chown -R node:node /usr/local/lib/node_modules/n8n
+RUN chown -R node:node /usr/lib/node_modules/n8n
 
 # Switch to the non-root user
 USER node
