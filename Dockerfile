@@ -16,6 +16,10 @@ RUN useradd -m -u 1000 node
 # Set the path n8n's internal task runner expects
 ENV N8N_PYTHON_VENV_PATH=/usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base/nodes/Code/python_venv
 
+# Force the legacy Python runner (no task runner)
+ENV N8N_RUNNERS_ENABLED=false
+ENV N8N_RUNNERS_MODE=external
+
 # Create the virtual environment and install required Python packages
 RUN python3 -m venv $N8N_PYTHON_VENV_PATH \
     && $N8N_PYTHON_VENV_PATH/bin/pip install --no-cache-dir \
