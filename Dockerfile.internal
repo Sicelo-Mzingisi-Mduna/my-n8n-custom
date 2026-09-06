@@ -1,0 +1,22 @@
+# Use the official n8n image (includes internal Python task runner)
+FROM n8nio/n8n:2.2.5
+
+USER root
+
+# Install Python and pip (Alpine)
+RUN apk add --no-cache python3 py3-pip
+
+# Install required Python packages into the existing runner venv
+RUN /opt/runners/task-runner-python/.venv/bin/pip install --no-cache-dir \
+    requests \
+    pandas \
+    numpy \
+    sqlalchemy \
+    psycopg2-binary \
+    pymongo \
+    python-dotenv \
+    openpyxl
+
+RUN chown -R node:node /opt/runners/task-runner-python
+
+USER node
