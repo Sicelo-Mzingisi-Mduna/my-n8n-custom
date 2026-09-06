@@ -1,10 +1,10 @@
-# Use the official n8n image as base
-FROM n8nio/n8n:latest
+# Use the Debian-based n8n image (includes apt-get)
+FROM n8nio/n8n:debian
 
 # Switch to root to install packages
 USER root
 
-# Install Python, pip, and venv support (Debian-based)
+# Install Python, pip, and venv support
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
